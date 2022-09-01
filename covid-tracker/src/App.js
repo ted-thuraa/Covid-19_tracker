@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 //import MenuItem from '@mui/material/MenuItem';
 //import FormControl from '@mui/material/FormControl';
 //import Select from '@mui/material/Select';
-
+import InfoBox from './InfoBox';
 import "./App.css";
 
 function App() {
-  const [countries, setCountries] = useState([])
+  const [countries, setCountries] = useState([]);
+  const [country, setCountry] = useState('worldwide');
+
   useEffect(() => {
     //code in here will run once
     //when the component loads and not again after
@@ -28,6 +30,12 @@ function App() {
     getCountriesData();
   }, []);
 
+  const onCountryChange = (event) => {
+    const countryCode = event.target.value;
+    
+    setCountry(countryCode);
+  }
+
   return (
     <div className="app">
       <div className="app__header">
@@ -35,14 +43,22 @@ function App() {
         <div className="app__dropdown">
           <label for="cars">Choose Country :</label>
 
-            <select name="cars" id="cars">
-              <option value="coutry">worldwide</option>
+            <select onChange={onCountryChange} value={country}>
+              <option value="country">worldwide</option>
               {countries.map(country => (
                 <option value={country.value}>{country.name}</option>
               ))}
             </select>
         </div>
+       
         
+      </div>
+      <div className="app-stats">
+        <InfoBox title="Coronavirus Cases"cases={123} total={2000}/>
+
+        <InfoBox title="Recovered" cases={4000} total={3000}/>
+
+        <InfoBox title="Deaths" cases={500} total={500}/>
       </div>
     </div>
   );
