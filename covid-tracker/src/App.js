@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 //import FormControl from '@mui/material/FormControl';
 //import Select from '@mui/material/Select';
 import InfoBox from './InfoBox';
+import Map from './Map';
 import "./App.css";
 
 function App() {
@@ -53,12 +54,18 @@ function App() {
        
         
       </div>
+
+
       <div className="app-stats">
         <InfoBox title="Coronavirus Cases"cases={123} total={2000}/>
 
         <InfoBox title="Recovered" cases={4000} total={3000}/>
 
         <InfoBox title="Deaths" cases={500} total={500}/>
+      </div>
+
+      <div>
+        <Map/>
       </div>
     </div>
   );
