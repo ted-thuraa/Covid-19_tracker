@@ -5,10 +5,22 @@ import React, { useEffect, useState } from "react";
 import InfoBox from './InfoBox';
 import Map from './Map';
 import "./App.css";
+import Table from "./Table"
 
 function App() {
   const [countries, setCountries] = useState([]);
   const [country, setCountry] = useState('worldwide');
+  const [countryInfo, setCountryInfo] = useState({});
+  const [tableData, setTableData] =  useState([]);
+
+  // fetches when the browser loads
+  useEffect(() => {
+    fetch('https://disease.sh/v3/covid-19/all')
+    .then(response => response.json())
+    .then(data => {
+      setCountryInfo(data);
+    });
+  }, []);
 
   useEffect(() => {
     //code in here will run once
@@ -24,49 +36,78 @@ function App() {
             name: country.country,//united states
             value: country.countryInfo.iso2, // us
           }
-        ))
-        setCountries(countries)
+        ));
+        setTableData(data);
+        setCountries(countries);
       })
     } 
     getCountriesData();
   }, []);
 
-  const onCountryChange = (event) => {
+  const onCountryChange = async (event) => {
     const countryCode = event.target.value;
-    
     setCountry(countryCode);
-  }
+
+    const url = countryCode === 'worldwide' 
+    ? 'https://disease.sh/v3/covid-19/all' : 
+    `https://disease.sh/v3/covid-19/countries/${countryCode}`
+    // backticks - for javascript concatenation with string
+    // https://disease.sh/v3/covid-19/all   worldwide
+    // https://disease.sh/v3/covid-19/countries{countries}
+    await fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      setCountry(countryCode);
+      setCountryInfo(data);
+    }) 
+
+  };
 
   return (
     <div className="app">
-      <div className="app__header">
-        <h1>Covid-19 Tracker</h1>
-        <div className="app__dropdown">
-          <label for="cars">Choose Country :</label>
+      <div className="app__left">
+        <div className="app__header">
+          <h1>Covid-19 Tracker</h1>
+          <div className="app__dropdown">
+            <label for="cars">Choose Country :</label>
 
-            <select onChange={onCountryChange} value={country}>
-              <option value="country">worldwide</option>
-              {countries.map(country => (
-                <option value={country.value}>{country.name}</option>
-              ))}
-            </select>
+              <select onChange={onCountryChange} value={country}>
+                <option value="worldwide">worldwide</option>
+                {countries.map(country => (
+                  <option value={country.value}>{country.name}</option>
+                ))}
+              </select>
+          </div>
+                
+                
         </div>
-       
+
+
+        <div className="app-stats">
+          <InfoBox title="Coronavirus Cases"cases={countryInfo.todayCases} total={countryInfo.cases}/>
+
+          <InfoBox title="Recovered" cases={countryInfo.todayRecovered} total={countryInfo.recovered}/>
+
+          <InfoBox title="Deaths" cases={countryInfo.todayDeaths} total={countryInfo.deaths}/>
+        </div>
+
+        <div>
+          <Map/>
+        </div>
+      </div>
+      <div className="app__right">
+        <div className="card">
+          <div className="container">
+            <h3>Live cases by country</h3>
+            <Table countries={tableData}/>
+            <h3>Worldwide new cases</h3>
+          </div>
+         
+        </div>
         
       </div>
 
-
-      <div className="app-stats">
-        <InfoBox title="Coronavirus Cases"cases={123} total={2000}/>
-
-        <InfoBox title="Recovered" cases={4000} total={3000}/>
-
-        <InfoBox title="Deaths" cases={500} total={500}/>
-      </div>
-
-      <div>
-        <Map/>
-      </div>
+      
     </div>
   );
 }
